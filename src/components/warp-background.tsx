@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useTheme } from "next-themes"
 
 interface WarpBackgroundProps {
@@ -13,183 +13,144 @@ interface WarpBackgroundProps {
 
 export function WarpBackground({
   className = "",
-  intensity = 1,
-  speed = 1,
-  backgroundColor = "hsl(var(--background))",
-  backgroundColorDark = "hsl(var(--background))"
+  intensity = 50,
+  speed = 0.5,
+  backgroundColor = "#ffffff",
+  backgroundColorDark = "#000000"
 }: WarpBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { theme } = useTheme()
-  const [particlesArray, setParticlesArray] = useState<any[]>([])
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const [isMounted, setIsMounted] = useState(false)
-  const isDarkMode = theme === 'dark'
-  const requestRef = useRef<number>()
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
-
-  // Make sure to use the appropriate background color based on theme
-  const bgColor = isDarkMode ? backgroundColorDark : backgroundColor
-  
-  // and make the particles less intrusive in dark mode
-  const particleColor = isDarkMode ? 
-    'rgba(255, 255, 255, 0.2)' : 
-    'rgba(0, 0, 0, 0.15)'
-
-  useEffect(() => {
-    // Check if dark mode is active
-    const isDark = document.documentElement.classList.contains('dark')
-    setIsMounted(isDark)
-
-    // Add listener for theme changes
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          const isDark = document.documentElement.classList.contains('dark')
-          setIsMounted(isDark)
-        }
-      })
-    })
-
-    observer.observe(document.documentElement, { attributes: true })
-    return () => observer.disconnect()
-  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    // Set canvas dimensions
-    const updateSize = () => {
-      const { width, height } = canvas.getBoundingClientRect()
-      canvas.width = width
-      canvas.height = height
-      setDimensions({ width, height })
-    }
-
-    // Handle resize
-    updateSize()
-    window.addEventListener('resize', updateSize)
-
-    // Initialize particles
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext("2d")
     if (!ctx) return
+
+    let animationFrameId: number
+    let mouseX = 0
+    let mouseY = 0
+    let particles: Particle[] = []
 
     class Particle {
       x: number
       y: number
       size: number
-      baseX: number
-      baseY: number
-      density: number
-      color: string
-      life: number
-      initialLife: number
+      speedX: number
+      speedY: number
+      intensity: number
 
-      constructor(x: number, y: number) {
+      constructor(x: number, y: number, size: number, intensity: number) {
         this.x = x
         this.y = y
-        this.baseX = x
-        this.baseY = y
-        this.size = Math.random() * 5 + 1
-        this.density = Math.random() * 30 + 1
-        this.color = particleColor
-        this.life = Math.random() * 100 + 50
-        this.initialLife = this.life
-      }
-
-      draw(context: CanvasRenderingContext2D) {
-        if (!context) return
-        const opacity = this.life / this.initialLife
-        context.beginPath()
-        context.arc(this.x, this.y, this.size, 0, Math.PI * 2)
-        context.closePath()
-        context.fillStyle = this.color
-        context.globalAlpha = opacity
-        context.fill()
+        this.size = size
+        this.speedX = (Math.random() - 0.5) * speed
+        this.speedY = (Math.random() - 0.5) * speed
+        this.intensity = intensity
       }
 
       update() {
-        const dx = mousePosition.x - this.x
-        const dy = mousePosition.y - this.y
+        if (!canvas) return
+
+        // Update position
+        this.x += this.speedX
+        this.y += this.speedY
+
+        // Mouse interaction
+        const dx = mouseX - this.x
+        const dy = mouseY - this.y
         const distance = Math.sqrt(dx * dx + dy * dy)
-        const forceDirectionX = dx / distance
-        const forceDirectionY = dy / distance
-        const maxDistance = intensity * 10
-        const force = (maxDistance - distance) / maxDistance
-        const directionX = forceDirectionX * force * this.density * (isMounted ? 1 : 0.1)
-        const directionY = forceDirectionY * force * this.density * (isMounted ? 1 : 0.1)
+        const maxDistance = 100
 
         if (distance < maxDistance) {
-          this.x -= directionX
-          this.y -= directionY
-        } else {
-          if (this.x !== this.baseX) {
-            const dx = this.x - this.baseX
-            this.x -= dx * speed
-          }
-          if (this.y !== this.baseY) {
-            const dy = this.y - this.baseY
-            this.y -= dy * speed
-          }
+          const force = (maxDistance - distance) / maxDistance
+          this.x -= dx * force * 0.02
+          this.y -= dy * force * 0.02
         }
 
-        this.life -= 0.5
-        if (this.life <= 0) {
-          this.life = 0
-        }
+        // Bounce off edges
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1
+      }
+
+      draw(ctx: CanvasRenderingContext2D) {
+        const currentTheme = theme === 'dark' ? backgroundColorDark : backgroundColor
+        ctx.fillStyle = currentTheme
+        ctx.globalAlpha = this.intensity
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+        ctx.fill()
       }
     }
 
+    function handleMouseMove(e: MouseEvent) {
+      if (!canvas) return
+      const rect = canvas.getBoundingClientRect()
+      mouseX = e.clientX - rect.left
+      mouseY = e.clientY - rect.top
+    }
+
+    function handleMouseLeave() {
+      mouseX = canvas.width / 2
+      mouseY = canvas.height / 2
+    }
+
+    function updateCanvasSize() {
+      if (!canvas) return
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      init() // Reinitialize particles when canvas size changes
+    }
+
     function init() {
+      if (!canvas) return
       const particlesCount = Math.floor((canvas.width * canvas.height) / 8000)
       const newParticlesArray = []
       for (let i = 0; i < particlesCount; i++) {
         const x = Math.random() * canvas.width
         const y = Math.random() * canvas.height
-        newParticlesArray.push(new Particle(x, y))
+        const size = Math.random() * 2 + 1
+        const particleIntensity = Math.random() * 0.5 + 0.2
+        newParticlesArray.push(new Particle(x, y, size, particleIntensity))
       }
-      setParticlesArray(newParticlesArray)
+      particles = newParticlesArray
     }
 
     function animate() {
-      if (!ctx) return
-      ctx.fillStyle = bgColor
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      
-      for (const particle of particlesArray) {
-        particle.draw(ctx)
+      if (!ctx || !canvas) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      particles.forEach(particle => {
         particle.update()
-      }
-      
-      requestRef.current = requestAnimationFrame(animate)
+        particle.draw(ctx)
+      })
+
+      animationFrameId = requestAnimationFrame(animate)
     }
 
-    init()
+    // Initialize
+    updateCanvasSize()
+    window.addEventListener('resize', updateCanvasSize)
+    canvas.addEventListener('mousemove', handleMouseMove)
+    canvas.addEventListener('mouseleave', handleMouseLeave)
+
+    // Start animation
     animate()
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect()
-      setMousePosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      })
-    }
-
-    canvas.addEventListener('mousemove', handleMouseMove)
-
+    // Cleanup
     return () => {
-      window.removeEventListener('resize', updateSize)
+      window.removeEventListener('resize', updateCanvasSize)
       canvas.removeEventListener('mousemove', handleMouseMove)
-      if (requestRef.current) {
-        cancelAnimationFrame(requestRef.current)
-      }
+      canvas.removeEventListener('mouseleave', handleMouseLeave)
+      cancelAnimationFrame(animationFrameId)
     }
-  }, [particlesArray, mousePosition, intensity, speed, backgroundColor, backgroundColorDark, isMounted])
+  }, [theme, intensity, speed, backgroundColor, backgroundColorDark])
 
   return (
-    <canvas 
-      ref={canvasRef} 
-      className={`absolute inset-0 w-full h-full -z-10 ${className}`}
+    <canvas
+      ref={canvasRef}
+      className={`fixed inset-0 -z-10 h-full w-full ${className}`}
     />
   )
 } 
