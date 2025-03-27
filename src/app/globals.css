@@ -1,26 +1,576 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.3rem;
+    --primary-rgb: 59, 130, 246; /* Default blue - adjust based on your color scheme */
+    --color-calendar-graph-day-bg: #1e1e2e;
+    --color-calendar-graph-day-L1-bg: #1b6e44;
+    --color-calendar-graph-day-L2-bg: #26a641;
+    --color-calendar-graph-day-L3-bg: #39d353;
+    --color-calendar-graph-day-L4-bg: #4bfa6b;
+  }
+
+  .dark {
+    --background: 225 15% 8%;
+    --foreground: 210 6% 93%;
+    --card: 225 16% 11%;
+    --card-foreground: 210 6% 93%;
+    --popover: 225 15% 8%;
+    --popover-foreground: 210 6% 93%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 6% 93%;
+    --secondary: 225 16% 15%;
+    --secondary-foreground: 210 6% 93%;
+    --muted: 225 15% 15%;
+    --muted-foreground: 217 10% 64%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 210 6% 93%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 6% 93%;
+    --border: 225 16% 15%;
+    --input: 225 16% 15%;
+    --ring: 217 91% 60%;
+    --primary-rgb: 96, 165, 250; /* Adjust for dark mode */
+  }
+
+  [data-theme='light'] {
+    --color-calendar-graph-day-bg: #ebedf0;
+    --color-calendar-graph-day-L1-bg: #9be9a8;
+    --color-calendar-graph-day-L2-bg: #40c463;
+    --color-calendar-graph-day-L3-bg: #30a14e;
+    --color-calendar-graph-day-L4-bg: #216e39;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply antialiased min-h-screen bg-background text-foreground;
+  }
+  
+  section {
+    @apply py-16;
+  }
 }
+
+/* Minimal styling */
+.card-minimal {
+  @apply bg-card/80 backdrop-blur-sm border-border/50;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.card-minimal:hover {
+  @apply bg-card/80;
+  transform: translateY(-2px);
+}
+
+/* Remove animations */
+.transition-none {
+  transition: none !important;
+}
+
+/* Custom animations */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-20px); }
+  60% { transform: translateY(-10px); }
+}
+
+.animate-blink {
+  animation: blink 1s infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  background-image: linear-gradient(
+    to right,
+    transparent 0%,
+    hsl(var(--secondary) / 0.8) 25%,
+    hsl(var(--secondary) / 0.6) 50%,
+    hsl(var(--secondary) / 0.8) 75%,
+    transparent 100%
+  );
+  animation: shimmer 3s infinite;
+}
+
+.animate-bounce-gentle {
+  animation: bounce 5s ease-in-out infinite;
+}
+
+/* Enhanced card effects */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Gradient backgrounds */
+.gradient-bg {
+  background: linear-gradient(45deg, hsl(var(--primary)), hsl(var(--secondary)));
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+.gradient-text {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500;
+  background-size: 200% 100%;
+  animation: gradient-shift 8s linear infinite;
+}
+
+/* Custom scrollbar */
+@layer utilities {
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: hsl(var(--secondary));
+    border-radius: 3px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary));
+    border-radius: 3px;
+  }
+}
+
+/* Add smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Simplified glass effect */
+.bg-card\/50 {
+  backdrop-filter: blur(12px);
+  background-color: hsl(var(--card) / 0.5);
+}
+
+/* Custom cursor styles */
+.windows-cursor {
+  cursor: url('/cursors/win-normal.png'), auto;
+}
+
+.windows-cursor a,
+.windows-cursor button,
+.windows-cursor [role="button"],
+.windows-cursor input[type="submit"],
+.windows-cursor input[type="reset"],
+.windows-cursor input[type="button"],
+.windows-cursor label[for],
+.windows-cursor select,
+.windows-cursor summary {
+  cursor: url('/cursors/win-pointer.png'), pointer;
+}
+
+.windows-cursor input[type="text"],
+.windows-cursor input[type="password"],
+.windows-cursor input[type="email"],
+.windows-cursor input[type="number"],
+.windows-cursor input[type="tel"],
+.windows-cursor input[type="url"],
+.windows-cursor textarea {
+  cursor: url('/cursors/win-text.png'), text;
+}
+
+/* Pixelated retro image effect */
+.pixelated {
+  image-rendering: pixelated;
+}
+
+/* Neon text effect */
+.neon-text {
+  text-shadow: 0 0 5px rgba(var(--primary-rgb), 0.8),
+               0 0 10px rgba(var(--primary-rgb), 0.4),
+               0 0 15px rgba(var(--primary-rgb), 0.2);
+  transition: text-shadow 0.3s ease;
+}
+
+.neon-text:hover {
+  text-shadow: 0 0 5px rgba(var(--primary-rgb), 1),
+               0 0 10px rgba(var(--primary-rgb), 0.8),
+               0 0 15px rgba(var(--primary-rgb), 0.6),
+               0 0 20px rgba(var(--primary-rgb), 0.4);
+}
+
+/* Consistent spacing */
+.section-container {
+  @apply max-w-3xl mx-auto px-4 sm:px-6 py-16;
+}
+
+.section-heading {
+  @apply text-2xl md:text-3xl font-bold mb-8 text-center;
+  background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Consistent text styles */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold;
+}
+
+p {
+  @apply leading-relaxed;
+}
+
+/* Subtle hover effects */
+.hover-lift {
+  @apply transition-transform duration-300;
+}
+
+.hover-lift:hover {
+  @apply -translate-y-1;
+}
+
+/* Blur fade transitions */
+.blur-fade {
+  @apply transition-all duration-1000 opacity-0 blur-md;
+}
+
+.blur-fade.visible {
+  @apply opacity-100 blur-0;
+}
+
+/* Improve card styles */
+.bg-card\/80 {
+  @apply backdrop-blur-sm;
+}
+
+/* Ensure proper spacing in grid layouts */
+.gap-4 {
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Tweet card specific styles */
+.tweet-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Improve backdrop blur */
+.backdrop-blur-sm {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Enhance hover transitions */
+.hover\:bg-card\/90:hover {
+  background-color: hsl(var(--card) / 0.9);
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Section spacing utilities */
+.py-20 {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.md\:py-32 {
+  @media (min-width: 768px) {
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+  }
+}
+
+/* Max width utilities */
+.max-w-7xl {
+  max-width: 80rem;
+}
+
+/* Hover animations */
+.hover\:scale-\[1\.02\]:hover {
+  transform: scale(1.02);
+}
+
+/* Transition utilities */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* GitHub calendar custom styles */
+.react-calendar-heatmap {
+  width: 100% !important;
+}
+
+.react-calendar-heatmap text {
+  font-size: 12px;
+  fill: var(--foreground);
+}
+
+/* Dark mode specific styles */
+[data-theme='dark'] .react-calendar-heatmap-month-label,
+[data-theme='dark'] .react-calendar-heatmap-weekday-label {
+  fill: hsl(var(--muted-foreground));
+}
+
+/* Card styles */
+.bg-card\/80 {
+  background-color: hsl(var(--card) / 0.8);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Section container */
+.section-container {
+  @apply max-w-3xl mx-auto px-4 sm:px-6 py-16;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+/* Improve card spacing */
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+/* GitHub calendar styles */
+.react-activity-calendar {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.react-activity-calendar__count {
+  font-size: 12px !important;
+}
+
+/* Scrollbar styles for the calendar container */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--primary)) transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--primary));
+  border-radius: 3px;
+}
+
+/* GitHub calendar container styles */
+.contribution-calendar-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  margin: 0 -1rem; /* Negative margin to align with container */
+  padding: 0 1rem; /* Padding to restore spacing */
+}
+
+.contribution-calendar-wrapper > div {
+  min-width: 720px; /* Minimum width to ensure readability */
+  width: 100%;
+}
+
+/* Make the calendar text color match the theme */
+.react-github-calendar text {
+  fill: currentColor;
+  font-size: 12px;
+}
+
+/* Adjust section container for GitHub section */
+.section-container {
+  @apply max-w-4xl mx-auto px-4 sm:px-6 py-16;
+}
+
+/* Custom scrollbar for the calendar */
+.contribution-calendar-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.contribution-calendar-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.contribution-calendar-wrapper::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--primary) / 0.3);
+  border-radius: 3px;
+}
+
+.contribution-calendar-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--primary) / 0.5);
+}
+
+/* GitHub contribution calendar styles */
+.contribution-wrapper {
+  margin: 0 -8px;
+}
+
+.calendar-container {
+  width: 100%;
+  padding: 0 8px;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+/* Style the calendar text */
+.calendar-container text {
+  font-size: 12px;
+  transition: fill 0.3s ease;
+}
+
+/* Style the contribution count text */
+.calendar-container > div > div:last-child {
+  padding-top: 24px;
+  font-size: 12px;
+  transition: color 0.3s ease;
+}
+
+/* Container transitions */
+.bg-card {
+  transition: background-color 0.3s ease;
+}
+
+.border-border {
+  transition: border-color 0.3s ease;
+}
+
+/* Make sure the calendar fits properly */
+.react-github-calendar {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Ensure proper spacing for the legend */
+.react-github-calendar > div:last-child {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Add smooth transitions */
+.transition-colors {
+  transition-property: color, background-color, border-color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* Container background */
+.bg-\[\#0d1117\] {
+  background-color: #0d1117;
+}
+
+/* Border color */
+.border-\[\#30363d\] {
+  border-color: #30363d;
+}
+
+/* Link color */
+.text-\[\#58a6ff\] {
+  color: #58a6ff;
+}
+
+.hover\:text-\[\#58a6ff\]\/80:hover {
+  color: rgba(88, 166, 255, 0.8);
+}
+
+/* Padding utilities */
+.p-8 {
+  padding: 2rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
