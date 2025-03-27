@@ -29,8 +29,8 @@ export function WarpBackground({
     if (!ctx) return
 
     let animationFrameId: number
-    let mouseX = 0
-    let mouseY = 0
+    let mouseX = canvas.width / 2
+    let mouseY = canvas.height / 2
     let particles: Particle[] = []
 
     class Particle {
@@ -50,9 +50,7 @@ export function WarpBackground({
         this.intensity = intensity
       }
 
-      update() {
-        if (!canvas) return
-
+      update(canvas: HTMLCanvasElement) {
         // Update position
         this.x += this.speedX
         this.y += this.speedY
@@ -74,8 +72,7 @@ export function WarpBackground({
         if (this.y < 0 || this.y > canvas.height) this.speedY *= -1
       }
 
-      draw(ctx: CanvasRenderingContext2D) {
-        const currentTheme = theme === 'dark' ? backgroundColorDark : backgroundColor
+      draw(ctx: CanvasRenderingContext2D, currentTheme: string) {
         ctx.fillStyle = currentTheme
         ctx.globalAlpha = this.intensity
         ctx.beginPath()
@@ -85,7 +82,6 @@ export function WarpBackground({
     }
 
     function handleMouseMove(e: MouseEvent) {
-      if (!canvas) return
       const rect = canvas.getBoundingClientRect()
       mouseX = e.clientX - rect.left
       mouseY = e.clientY - rect.top
@@ -97,14 +93,12 @@ export function WarpBackground({
     }
 
     function updateCanvasSize() {
-      if (!canvas) return
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
       init() // Reinitialize particles when canvas size changes
     }
 
     function init() {
-      if (!canvas) return
       const particlesCount = Math.floor((canvas.width * canvas.height) / 8000)
       const newParticlesArray = []
       for (let i = 0; i < particlesCount; i++) {
@@ -118,12 +112,12 @@ export function WarpBackground({
     }
 
     function animate() {
-      if (!ctx || !canvas) return
       ctx.clearRect(0, 0, canvas.width, canvas.height)
+      const currentTheme = theme === 'dark' ? backgroundColorDark : backgroundColor
 
       particles.forEach(particle => {
-        particle.update()
-        particle.draw(ctx)
+        particle.update(canvas)
+        particle.draw(ctx, currentTheme)
       })
 
       animationFrameId = requestAnimationFrame(animate)

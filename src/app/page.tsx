@@ -13,7 +13,7 @@ import { CustomCursor } from "@/components/custom-cursor"
 import { BlurFadeSection } from "@/components/blur-fade-section"
 import { RetroGrid } from "@/components/retro-grid"
 import { ShinyBorder } from "@/components/shiny-border"
-import { TweetCard } from "@/components/tweet-card"
+import { SocialLinks } from "@/components/tweet-card"
 import { TypewriterEffect } from "@/components/typewriter-effect"
 import { GitHubContributions } from "@/components/github-calendar"
 
@@ -233,7 +233,7 @@ export default function Portfolio() {
       <BlurFadeSection>
         <section className="py-20 md:py-32"> {/* Increased vertical spacing */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6"> {/* Wider container for tweets */}
-            <TweetCard />
+            <SocialLinks />
           </div>
         </section>
       </BlurFadeSection>
