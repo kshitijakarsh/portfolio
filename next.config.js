@@ -8,7 +8,12 @@ const nextConfig = {
         hostname: '**',
       },
     ],
-    domains: ['localhost'],
+    domains: [
+      'github.com',
+      'avatars.githubusercontent.com',
+      'pbs.twimg.com', // For Twitter profile pictures
+      'abs.twimg.com', // For Twitter media
+    ],
   },
 };
 
