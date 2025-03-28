@@ -19,7 +19,6 @@ import { ScrollProgress } from "@/components/scroll-progress";
 import { CustomCursor } from "@/components/custom-cursor";
 import { BlurFadeSection } from "@/components/blur-fade-section";
 import { ShinyBorder } from "@/components/shiny-border";
-import { TweetCard } from "@/components/tweet-card";
 import { TypewriterEffect } from "@/components/typewriter-effect";
 import { GitHubContributions } from "@/components/github-calendar";
 import { WarpBackground } from "@/components/magicui/warp-background";
