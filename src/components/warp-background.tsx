@@ -120,23 +120,26 @@ export default function WarpBackground({
     }
 
     function handleMouseMove(e: MouseEvent) {
+      if (!canvas) return;
       const rect = canvas.getBoundingClientRect()
       mouseX = e.clientX - rect.left
       mouseY = e.clientY - rect.top
     }
 
     function handleMouseLeave() {
-      mouseX = canvas.width / 2
-      mouseY = canvas.height / 2
+      mouseX = 0
+      mouseY = 0
     }
 
     function updateCanvasSize() {
+      if (!canvas || !ctx) return;
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
-      init() // Reinitialize particles when canvas size changes
+      init()
     }
 
     function init() {
+      if (!canvas) return;
       const particlesCount = Math.floor((canvas.width * canvas.height) / 15000)
       const newParticlesArray = []
       for (let i = 0; i < particlesCount; i++) {
@@ -150,6 +153,7 @@ export default function WarpBackground({
     }
 
     function animate() {
+      if (!canvas || !ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       
       // Draw the grid first
