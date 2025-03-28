@@ -11,12 +11,12 @@ interface WarpBackgroundProps {
   backgroundColorDark?: string
 }
 
-export function WarpBackground({
+export default function WarpBackground({
   className = "",
   intensity = 50,
   speed = 0.5,
-  backgroundColor = "#ffffff",
-  backgroundColorDark = "#000000"
+  backgroundColor = "rgba(0, 0, 0, 0.2)",
+  backgroundColorDark = "rgba(0, 0, 0, 0.4)"
 }: WarpBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { theme } = useTheme()
@@ -40,6 +40,7 @@ export function WarpBackground({
       speedX: number
       speedY: number
       intensity: number
+      color: string
 
       constructor(x: number, y: number, size: number, intensity: number) {
         this.x = x
@@ -48,6 +49,7 @@ export function WarpBackground({
         this.speedX = (Math.random() - 0.5) * speed
         this.speedY = (Math.random() - 0.5) * speed
         this.intensity = intensity
+        this.color = theme === 'dark' ? 'rgba(0, 255, 128, 0.5)' : 'rgba(0, 255, 128, 0.3)'
       }
 
       update(canvas: HTMLCanvasElement) {
@@ -72,13 +74,49 @@ export function WarpBackground({
         if (this.y < 0 || this.y > canvas.height) this.speedY *= -1
       }
 
-      draw(ctx: CanvasRenderingContext2D, currentTheme: string) {
-        ctx.fillStyle = currentTheme
+      draw(ctx: CanvasRenderingContext2D) {
+        ctx.fillStyle = this.color
         ctx.globalAlpha = this.intensity
         ctx.beginPath()
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
         ctx.fill()
       }
+    }
+
+    function drawGrid(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
+      const gridSize = 50
+      const currentTheme = theme === 'dark' ? backgroundColorDark : backgroundColor
+      
+      ctx.strokeStyle = theme === 'dark' ? 'rgba(0, 255, 128, 0.2)' : 'rgba(0, 255, 128, 0.1)'
+      ctx.lineWidth = 1
+
+      // Draw vertical lines
+      for (let x = 0; x <= canvas.width; x += gridSize) {
+        ctx.beginPath()
+        ctx.moveTo(x, 0)
+        ctx.lineTo(x, canvas.height)
+        ctx.stroke()
+      }
+
+      // Draw horizontal lines
+      for (let y = 0; y <= canvas.height; y += gridSize) {
+        ctx.beginPath()
+        ctx.moveTo(0, y)
+        ctx.lineTo(canvas.width, y)
+        ctx.stroke()
+      }
+
+      // Add perspective effect
+      const centerX = canvas.width / 2
+      const centerY = canvas.height / 2
+      const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY)
+
+      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, maxRadius)
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)')
+      gradient.addColorStop(1, currentTheme)
+      
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
     }
 
     function handleMouseMove(e: MouseEvent) {
@@ -99,7 +137,7 @@ export function WarpBackground({
     }
 
     function init() {
-      const particlesCount = Math.floor((canvas.width * canvas.height) / 8000)
+      const particlesCount = Math.floor((canvas.width * canvas.height) / 15000)
       const newParticlesArray = []
       for (let i = 0; i < particlesCount; i++) {
         const x = Math.random() * canvas.width
@@ -113,11 +151,14 @@ export function WarpBackground({
 
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      const currentTheme = theme === 'dark' ? backgroundColorDark : backgroundColor
+      
+      // Draw the grid first
+      drawGrid(ctx, canvas)
 
+      // Then draw and update particles
       particles.forEach(particle => {
         particle.update(canvas)
-        particle.draw(ctx, currentTheme)
+        particle.draw(ctx)
       })
 
       animationFrameId = requestAnimationFrame(animate)
@@ -147,4 +188,4 @@ export function WarpBackground({
       className={`fixed inset-0 -z-10 h-full w-full ${className}`}
     />
   )
-} 
+}

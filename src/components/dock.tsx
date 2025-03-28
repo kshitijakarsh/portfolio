@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { Home, User, Code, Github } from "lucide-react"
 
-// Define type for props
 interface DockProps {
   activeSection: string;
 }
@@ -25,7 +24,7 @@ export function Dock({ activeSection }: DockProps) {
   ]
 
   return (
-    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 px-3 py-2 rounded-lg bg-card border border-border backdrop-blur">
+    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 px-3 py-2 rounded-xl bg-card border border-border backdrop-blur">
       {navItems.map((item) => {
         const isActive = activeSection === item.id
         const Icon = item.icon
